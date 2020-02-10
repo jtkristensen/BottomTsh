@@ -1,0 +1,26 @@
+name:                botTshFFC
+version:             0.1.0.0
+github:              "FurryRogue/botTshFFC"
+license:             BSD3
+author:              "Joachim Tilsted Kristensen"
+maintainer:          "tilsted@di.ku.dk"
+copyright:           "Joachim Tilsted Kristensen"
+
+dependencies:
+- base >= 4.7 && < 5
+- parsec
+- csound-expression
+- csound-expression-typed
+- csound-sampler
+- singletons
+- mtl
+- first-class-families
+- typenums
+- tuple
+- parsec
+- syb
+- template-haskell
+- text
+
+library:
+  source-dirs: src
