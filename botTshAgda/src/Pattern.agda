@@ -38,12 +38,13 @@ none (suc n) = appendP (o ⟧) (-pattern n)
 expand : {A : Set}{n : ℕ}(m : ℕ) → Pattern A n → Pattern A (n + m)
 expand m p = appendP p (-pattern m)
 
-stretch' : {A : Set}{n : ℕ}(m : ℕ) → Pattern A n → Pattern A (n * m)
-stretch' (suc m)  ⟧        = ⟧
-stretch' (suc m) (⟨ a ⟩ p) = ⟨ a ⟩ (appendP (-pattern m) (stretch' (suc m) p))
-stretch' (suc m) (  o   p) =   o   (appendP (-pattern m) (stretch' (suc m) p))
-stretch' (suc m) (  -   p) =   -   (appendP (-pattern m) (stretch' (suc m) p))
-stretch' {n = n} 0 p rewrite *-comm n 0 = ⟧
+private
+  stretch' : {A : Set}{n : ℕ}(m : ℕ) → Pattern A n → Pattern A (n * m)
+  stretch' (suc m)  ⟧        = ⟧
+  stretch' (suc m) (⟨ a ⟩ p) = ⟨ a ⟩ (appendP (-pattern m) (stretch' (suc m) p))
+  stretch' (suc m) (  o   p) =   o   (appendP (-pattern m) (stretch' (suc m) p))
+  stretch' (suc m) (  -   p) =   -   (appendP (-pattern m) (stretch' (suc m) p))
+  stretch' {n = n} 0 _ rewrite *-comm n 0 = ⟧
 
 stretch : {A : Set}{n : ℕ}(m : ℕ) → Pattern A n → Pattern A (m * n)
 stretch {n = n} m p rewrite *-comm m n = stretch' m p

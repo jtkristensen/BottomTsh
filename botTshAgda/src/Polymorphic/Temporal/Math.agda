@@ -46,7 +46,6 @@ s[n+m]≡m+sn {suc n} {suc m}
 *-distrib-+ (suc n) m k
   rewrite *-distrib-+ n m k = sym (+-assoc k (n * k) (m * k))
 
-
 n≤m→n⊔m≡m : {n m : ℕ} → n ≤ m → n ⊔ m ≡ m
 n≤m→n⊔m≡m {zero}  {m}     n≤m    = refl
 n≤m→n⊔m≡m {suc n} {suc m} n≤m

@@ -1,5 +1,5 @@
 
-module BotTsh where
+module BottomTsh where
 
 import Pattern                               as Pat
 import Rhythm                                as Rhy
@@ -15,7 +15,6 @@ import Data.Nat.Properties                   as NatProp
 import Agda.Builtin.String                   as String
 import Relation.Binary.PropositionalEquality as Eq
 
--- rendering
 open import Agda.Builtin.IO
 open import Agda.Builtin.Unit
 open import Audio
@@ -35,17 +34,18 @@ open Rhy     using    ( Rhythm ; repeat
                       ) public
              using    ( sequence ; u↑l )
              renaming ( eval to evalR )
-open Pat     using    ( Pattern ; ⟨_⟩_ ; o_ ; -_ ; ⟧ ) public
+open Pat     using    ( Pattern ; ⟨_⟩_ ; o_ ; -_ ; ⟧ ; expand ) public
              using    ( phrase )
-open Fin     using    ( Fin )
+open Fin     using    ( Fin ) public
              renaming ( zero     to zero'
                       ; suc      to suc' )
 open Dec     using    ( False ; True ; fromWitness ; toWitness)
-open Nat     using    ( ℕ ; _+_ ; _*_ ; suc; zero)
+open Nat     using    ( ℕ ; _+_ ; _*_ ; suc; zero) public
+open Nat     renaming (_*_ to _⸴_) public
 open Int     using    ( ℤ ; +_  ; _-_ ; ∣_∣ ; _⊖_ )
 open Rat     using    ( ℚ ; normalize )
-open NatProp using    ( _≟_ ; *-comm )
-open String  renaming ( String to Name )
+open NatProp using    ( _≟_ ; +-comm ; *-comm )
+open String  renaming ( String to Name ) public
 open Eq      using    ( _≡_ ; sym )
 open LCM     using    ( lcm ; lcm-comm )
 
@@ -78,7 +78,8 @@ private
 mutual
   eval : {n d : ℕ} → {d≢0 : d ≢0} → ⊥'tsh n d → Tile Sample n d
   eval voice name begin rh end = fmap (sample name) (evalR rh)
-  eval {d≢0 = d≢0} (sim t₁ t₂) = reset (eval {_}{_}{d≢0} t₁) % (eval {_}{_}{d≢0} t₂)
+  eval {n}{d}{d≢0} (sim t₁ t₂)
+   = reset (eval {_}{_}{d≢0} t₁) % (eval {_}{_}{d≢0} t₂)
   eval {d≢0 = d≢0} (seq t₁ t₂) = eval {_}{_}{d≢0} t₁ % eval {_}{_}{d≢0} t₂
   eval {d≢0 = d≢0} (loop  m t) = loop' m d≢0 t
 
@@ -90,6 +91,10 @@ mutual
     loop' : ∀ m {n d} → (d≢0 : d ≢0) → ⊥'tsh n d → Tile Sample (m * n) d
     loop'  zero   {d = d} d≢0 t = noneT 0 d {d≢0}
     loop' (suc m)         d≢0 t = eval {_}{_}{d≢0} t % loop' m d≢0 t
+
+playback : ∀ n → Name → ({m : ℕ} → Pattern (Fin 16) m → Pattern (Fin 16) (suc m)) → ⊥'tsh n 1
+playback 0       f _ = voice f begin ⟦ 1 ∥ ⟧ end
+playback (suc n) f p = voice f begin ⟦ 1 ∥ (expand n (p ⟧)) end
 
 0'_ : {n : ℕ} → Pattern (Fin 16) n → Pattern (Fin 16) (suc n)
 1'_ : {n : ℕ} → Pattern (Fin 16) n → Pattern (Fin 16) (suc n)
@@ -154,23 +159,23 @@ private
             | NatProp.*-comm u m
             | NatProp.*-assoc m u n = loop m (u↑ n d u {u≢0} t)
   sim↑l : (n₁ d₁ d₂ : ℕ) → (d₁≢0 : d₁ ≢0)
-      → ⊥'tsh n₁ d₁ → {q≢0 : q₁ d₁ {d₁≢0} d₂ ≢0}
-      → ⊥'tsh (q₁ d₁ {d₁≢0} d₂ * n₁) (lcm d₁ d₂)
+      → ⊥'tsh n₁ d₁ → {q≢0 : q₁ d₁ d₂ ≢0}
+      → ⊥'tsh (q₁ d₁ d₂ * n₁) (lcm d₁ d₂)
   sim↑l n₁ d₁ d₂ d₁≢0 t₁ {q≢0}
-    rewrite sym (q₁[m,n]*n≡lcm[m,n] d₂ d₁ {d₁≢0})
-     = u↑ n₁ d₁ (q₁ d₁ {d₁≢0} d₂) {q≢0} t₁
+    rewrite sym (q₁[m,n]*n≡lcm[m,n] d₂ d₁)
+     = u↑ n₁ d₁ (q₁ d₁ d₂) {q≢0} t₁
   sim↑r : (n₂ d₁ d₂ : ℕ) → (d₂≢0 : d₂ ≢0)
-      → ⊥'tsh n₂ d₂ → {q≢0 : q₁ d₂ {d₂≢0} d₁ ≢0}
-      → ⊥'tsh (q₁ d₂ {d₂≢0} d₁ * n₂) (lcm d₁ d₂)
+      → ⊥'tsh n₂ d₂ → {q≢0 : q₁ d₂ d₁ ≢0}
+      → ⊥'tsh (q₁ d₂ d₁ * n₂) (lcm d₁ d₂)
   sim↑r n₂ d₁ d₂ d₂≢0 t₂ {q≢0}
-    rewrite sym (q₁[m,n]*n≡lcm[n,m] d₁ d₂ {d₂≢0})
-     = u↑ n₂ d₂ (q₁ d₂ {d₂≢0} d₁) {q≢0} t₂
+    rewrite sym (q₁[m,n]*n≡lcm[n,m] d₁ d₂)
+     = u↑ n₂ d₂ (q₁ d₂ d₁) {q≢0} t₂
 
 infixr 4 _،_
 _،_ : {n₁ n₂ d₁ d₂ : ℕ} → {d₁≢0 : d₁ ≢0} → {d₂≢0 : d₂ ≢0}
     → {eq : True (n₁ * d₂ ≟ n₂ * d₁)}
-    → {q₁≢0 : q₁ d₁ {d₁≢0} d₂ ≢0} → {q₂≢0 : q₁ d₂ {d₂≢0} d₁ ≢0}
-    → ⊥'tsh n₁ d₁ → ⊥'tsh n₂ d₂ → ⊥'tsh (q₁ d₂ {d₂≢0} d₁ * n₂) (lcm d₁ d₂)
+    → {q₁≢0 : q₁ d₁ d₂ ≢0} → {q₂≢0 : q₁ d₂ d₁ ≢0}
+    → ⊥'tsh n₁ d₁ → ⊥'tsh n₂ d₂ → ⊥'tsh (q₁ d₂ d₁ * n₂) (lcm d₁ d₂)
 _،_ {n₁} {n₂} {d₁} {d₂} {d₁≢0} {d₂≢0} {eq} {q₁≢0} {q₂≢0} t₁ t₂
   with sim↑l n₁ d₁ d₂ d₁≢0 t₁ {q₁≢0} | sim↑r n₂ d₁ d₂ d₂≢0 t₂ {q₂≢0}
 ... | t₁' | t₂'
@@ -179,10 +184,9 @@ _،_ {n₁} {n₂} {d₁} {d₂} {d₁≢0} {d₂≢0} {eq} {q₁≢0} {q₂≢0
 
 infixr 3 _;_
 _;_ : {n₁ n₂ d₁ d₂ : ℕ} → {d₁≢0 : d₁ ≢0} → {d₂≢0 : d₂ ≢0}
-    → {q₁≢0 : q₁ d₁ {d₁≢0} d₂ ≢0} → {q₂≢0 : q₁ d₂ {d₂≢0} d₁ ≢0}
+    → {q₁≢0 : q₁ d₁ d₂ ≢0} → {q₂≢0 : q₁ d₂ d₁ ≢0}
     → ⊥'tsh n₁ d₁
     → ⊥'tsh n₂ d₂
-    → ⊥'tsh (q₁ d₁ {d₁≢0} d₂ * n₁ + q₁ d₂ {d₂≢0} d₁ * n₂) (lcm d₁ d₂)
+    → ⊥'tsh (q₁ d₁ d₂ * n₁ + q₁ d₂ d₁ * n₂) (lcm d₁ d₂)
 _;_ {n₁} {n₂} {d₁} {d₂} {d₁≢0} {d₂≢0} {q₁≢0} {q₂≢0} t₁ t₂
   = seq (sim↑l n₁ d₁ d₂ d₁≢0 t₁ {q₁≢0}) (sim↑r n₂ d₁ d₂ d₂≢0 t₂ {q₂≢0})
-

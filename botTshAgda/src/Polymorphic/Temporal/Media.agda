@@ -14,7 +14,7 @@ import Relation.Nullary                      as Dec
 import Relation.Binary.PropositionalEquality as Eq
 
 open import Polymorphic.Temporal.Math
-open Int     using (ℤ; ∣_∣; _-_; +_; _⊖_)
+open Int     using (ℤ; ∣_∣; _-_; +_; _⊖_ ; -[1+_])
 open Nat     using (ℕ; zero; suc; _+_; _*_; _≤_ ; s≤s ; z≤n ;_⊔_)
 open NatProp using (_≤?_ ; ≤-pred ; suc-injective ; ≤-reflexive; ⊔-comm)
 open Dec     using (yes ; no ; ¬_)
@@ -38,14 +38,14 @@ stretch : {A : Set}{n : ℕ} → (k : ℕ) → Media A n → Media A (n * k)
 stretch k (none n  )          = none (n * k)
 stretch k (some n a)          = some (n * k) a
 stretch k (_:+:_ {d1} {d2} m1 m2)
-  rewrite *-distrib-+ d1 d2 k  = stretch k m1 :+: stretch k m2
+  rewrite *-distrib-+ d1 d2 k = stretch k m1 :+: stretch k m2
 stretch k (m1 :=: m2)         = stretch k m1 :=: stretch k m2
 
 -- Prepend/append silence.
 delay : {A : Set}{m : ℕ}(n : ℤ) → Media A m → Media A (m + ∣ n ∣)
-delay {_}{k} (ℤ.pos n) m
+delay {_}{k} (+ n) m
   rewrite +-comm k n = none n :+: m
-delay (ℤ.negsuc n) m = m :+: none (suc n)
+delay (-[1+ n ]) m = m :+: none (suc n)
 
 -- The shorter of two Media values, delayed to fit _:=:_
 short : {A : Set}{dur₁ dur₂ : ℕ} → Media A dur₁ → Media A dur₂ → Media A (dur₁ ⊔ dur₂)
