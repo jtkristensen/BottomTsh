@@ -41,6 +41,10 @@ instance Semigroup Pt where
   (PAbyss   p) <> p' = PAbyss   (p <> p')
   (PAnnex   p) <> p' = PAnnex   (p <> p')
 
+instance Monoid Pt where
+  mempty  = PEmpty
+  mappend = (<>)
+
 data Rh
   = RTuplet             Integer  Pt
   | RPhrasing [Integer] Integer  Pt
@@ -52,11 +56,77 @@ data Rh
 instance Semigroup Rh where
   (<>) = RSequence
 
+instance Monoid Rh where
+  mempty  = RTuplet 1 mempty
+  mappend = (<>)
+
 data Bt
   = BtVoice String  Rh
   | BtSim   Bt      Bt
   | BtSeq   Bt      Bt
   | BtLoop  Integer Bt
+
+-- Compile time grid transformation ---
+
+q1, q2 :: Integer -> Integer -> Integer
+q1 n m = lcm n m `div` n
+q2 n m = q1 m n
+
+ptExtend ::Integer -> Pt -> Pt
+ptExtend 0 pt = pt
+ptExtend n pt = ptExtend (n - 1) (pt <> annex)
+  where annex = PAnnex PEmpty
+
+ptExpand :: Integer -> Pt -> Pt
+ptExpand _  PEmpty         = PEmpty
+ptExpand n (PEvent v rest) = ptExtend (n - 1) (PEvent v PEmpty) <> ptExpand n rest
+ptExpand n (PAbyss   rest) = ptExtend (n - 1) (PAbyss   PEmpty) <> ptExpand n rest
+ptExpand n (PAnnex   rest) = ptExtend (n - 1) (PAnnex   PEmpty) <> ptExpand n rest
+
+lExpand :: Int -> [a] -> [a]
+lExpand _ [       ] = []
+lExpand n (a : as') = (take n (repeat a)) ++ lExpand n as'
+
+rhU :: Rh -> Integer
+rhU (RTuplet     m _) = m
+rhU (RPhrasing _ m _) = m
+rhU (RAhead    q  rh) = lcm (denominator q) (rhU rh)
+rhU (RBehind   q  rh) = lcm (denominator q) (rhU rh)
+rhU (RSequence r1 r2) = lcm (rhU r1) (rhU r2)
+rhU (RRepeat   _  rh) = rhU rh
+
+btU :: Bt -> Integer
+btU (BtVoice _ rh) = rhU rh
+btU (BtSim  b1 b2) = lcm (btU b1) (btU b2)
+btU (BtSeq  b1 b2) = lcm (btU b1) (btU b2)
+btU (BtLoop _  bt) = btU bt
+
+rhUp :: Integer -> Rh -> Rh
+rhUp n (RTuplet      m ph) = RTuplet                   (n * m) (ptExpand n ph)
+rhUp n (RPhrasing ns m ph) = RPhrasing (lExpand n' ns) (n * m) (ptExpand n ph)
+  where n' = fromIntegral n
+rhUp n (RAhead    q    rh) = RAhead    q  (rhUp n rh)
+rhUp n (RBehind   q    rh) = RBehind   q  (rhUp n rh)
+rhUp n (RSequence rh1 rh2) = RSequence    (rhUp n rh1) (rhUp n rh2)
+rhUp n (RRepeat     t rh ) = RRepeat   t  (rhUp n rh)
+
+btUp :: Integer -> Bt -> Bt
+btUp n (BtVoice v rh) = BtVoice v (rhUp n rh)
+btUp n (BtSim  b1 b2) = BtSim (btUp n b1) (btUp n b2)
+btUp n (BtSeq  b1 b2) = BtSeq (btUp n b1) (btUp n b2)
+btUp n (BtLoop t  bt) = BtLoop t (btUp n bt)
+
+btSimL :: Bt -> Bt -> Bt
+btSimL b1 b2 = btUp (q2 (btU b1) (btU b2)) b1
+
+btSimR :: Bt -> Bt -> Bt
+btSimR b1 b2 = btUp (q1 (btU b1) (btU b2)) b2
+
+btTransformLCM :: Bt -> Bt
+btTransformLCM (BtVoice v rh ) = BtVoice v rh
+btTransformLCM (BtSim bt1 bt2) = BtSim (btSimL bt1 bt2) (btSimR bt1 bt2)
+btTransformLCM (BtSeq bt1 bt2) = BtSeq (btSimL bt1 bt2) (btSimR bt1 bt2)
+btTransformLCM (BtLoop t  bt ) = BtLoop t (btTransformLCM bt)
 
 -- Simple Parser ----------------------
 
@@ -177,6 +247,7 @@ compileProgram s =  do loc <- location
                                  fst (loc_start loc),
                                  snd (loc_start loc))
                        prg <- parseProgram pos s
+                       -- [ put transformations here ]
                        [e| prg |]
 
 build, call :: Language.Haskell.TH.Syntax.Name -> [Q Exp] -> Q Exp
@@ -235,6 +306,7 @@ instance Lift Rh where
   lift (RRepeat   t  r ) = build 'Repeat   [ lift $ i2n t
                                            , lift r]
 
+-- Safe but too slow.
 instance Lift Bt where
   lift (BtVoice n r  ) = build 'Voice [ lift n
                                       , lift r]

@@ -25,4 +25,4 @@ dependencies:
 library:
   source-dirs: src
   ghc-options:
-  - -freduction-depth=500000
+  - -freduction-depth=4096

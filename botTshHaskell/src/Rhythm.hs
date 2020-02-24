@@ -1,5 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable
-           , DataKinds
+{-# LANGUAGE DataKinds
            , GADTs
            , KindSignatures
            , TypeOperators

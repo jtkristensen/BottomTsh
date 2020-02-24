@@ -5,6 +5,7 @@
            , TypeOperators
            , UndecidableInstances
            , NoImplicitPrelude
+           , TypeSynonymInstances
   #-}
 
 module Lib.Nat where

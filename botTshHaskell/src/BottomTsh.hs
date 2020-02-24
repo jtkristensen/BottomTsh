@@ -1,5 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable
-           , DataKinds
+{-# LANGUAGE DataKinds
            , GADTs
            , KindSignatures
            , TypeOperators
@@ -83,6 +82,7 @@ unitUpBt u (Loop m  bt ) =
   %|  multAssoc m u n
   %|  Loop m (unitUpBt u bt)
 
+-- Future work: LCM and Quotients.
 sim :: ((d2 :* n1) ~ (d1 :* n2))
     => BottomTsh n1 d1 -> BottomTsh n2 d2 -> BottomTsh (d1 :* n2) (d1 :* d2)
 sim bt1 bt2 =
