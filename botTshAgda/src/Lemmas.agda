@@ -74,7 +74,6 @@ q₁ n m = quotient (m∣lcm[m,n] n m)
 ∣x-x∣≡0 (ℤ.negsuc  zero  ) = refl
 ∣x-x∣≡0 (ℤ.negsuc (suc n)) = ∣x-x∣≡0 (ℤ.negsuc n)
 
-
 ∣+s-+0∣≡s : ∀ (s : ℕ) → ( ∣ (+ s) - +0 ∣ ) ≡ s
 ∣+s-+0∣≡s  zero                      = refl
 ∣+s-+0∣≡s (suc s) rewrite +-comm s 0 = refl

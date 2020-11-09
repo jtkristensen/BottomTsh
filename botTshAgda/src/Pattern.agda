@@ -31,6 +31,10 @@ appendP (  -    p₁) p₂ = -     (appendP p₁ p₂)
 -pattern zero    = ⟧
 -pattern (suc n) = - (-pattern n)
 
+opattern : {A : Set}(n : ℕ) → Pattern A n
+opattern zero    = ⟧
+opattern (suc n) = - (-pattern n)
+
 none : {A : Set} → (n : ℕ) → Pattern A n
 none zero    = ⟧
 none (suc n) = appendP (o ⟧) (-pattern n)

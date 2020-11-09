@@ -35,7 +35,7 @@ open NatDiv  using    ( _/_ )
 
 data Rhythm (A : Set) : (n d : ℕ) → Set where
   ⟦_∥_     : {n : ℕ} → (d : ℕ) → {d ≢0} → Pattern A n → Rhythm A n d
-  ⟦ph_⸲_∥_  : {n : ℕ} → {sum : ℕ} → {sum ≢0} → NatList n sum → (d : ℕ) → {d ≢0}
+  ⟦ph_∥_∥_  : {n : ℕ} → {sum : ℕ} → {sum ≢0} → NatList n sum → (d : ℕ) → {d ≢0}
            → Pattern A n → Rhythm A (sum * n) (sum * d)
   ahead    : {n d : ℕ} → (t : ℕ) → Rhythm A n d → Rhythm A n d
   behind   : {n d : ℕ} → (t : ℕ) → Rhythm A n d → Rhythm A (n) (d)
@@ -48,7 +48,7 @@ none n (suc d) {d≢0} = ⟦_∥_ (suc d) {d≢0} (noneP n)
 -- note, test stretch with ahead/behind.
 stretch : {A : Set} → {n d : ℕ} → (k : ℕ) → Rhythm A n d → Rhythm A (k * n) d
 stretch k (⟦_∥_     d {d≢0} p) = ⟦_∥_ d {d≢0} (stretchP k p)
-stretch k (⟦ph_⸲_∥_ {n} {m} {m≢0} t d {d≢0} p)
+stretch k (⟦ph_∥_∥_ {n} {m} {m≢0} t d {d≢0} p)
         = ⟦_∥_ (m * d) {n≢0∧m≢0→nm≢0 m d m≢0 d≢0}
           (stretchP k (phrase (stretchNL n t) p))
 stretch k (sequence {n} {m} r₁ r₂)
@@ -63,10 +63,13 @@ stretch k (repeat {n} {d} {d≢0} t r)
   rewrite sym (*-assoc k n t)
         = repeat {_} {_} {_} {d≢0} t (stretch k r)
 
+-- shrink : {A : Set}{n d : ℕ}(u : ℕ){u≢0 : (u ≢0)} → Rhythm A n d → Rhythm A (n) (u * d)
+-- shrink -> todo if possible.
+
 -- note, test u↑l with ahead/behind.
 u↑l : {A : Set}{n d : ℕ}(u : ℕ){u≢0 : (u ≢0)} → Rhythm A n d → Rhythm A (u * n) (u * d)
 u↑l u {u≢0} (⟦_∥_ d {d≢0} p) = stretch u (⟦_∥_ (u * d) {n≢0∧m≢0→nm≢0 u d u≢0 d≢0} p)
-u↑l u {u≢0} (⟦ph_⸲_∥_ {n} {m} {m≢0} t d {d≢0} p)
+u↑l u {u≢0} (⟦ph_∥_∥_ {n} {m} {m≢0} t d {d≢0} p)
   with n≢0∧m≢0→nm≢0 u (m * d) u≢0 (n≢0∧m≢0→nm≢0 m d m≢0 d≢0)
 ... | umd≢0 = stretch u (⟦_∥_ (u * (m * d)) {umd≢0} (phrase (stretchNL n t) p))
 u↑l u {u≢0} (ahead  t r) = ahead  (u * t) (u↑l u {u≢0} r)
@@ -100,7 +103,7 @@ u↑r {d = d} u {u≢0} r rewrite *-comm d u = u↑l u {u≢0} r
 ↑u₁ u {u≢0} (⟦_∥_     d {d≢0} p)
   with n≢0∧m≢0→lcm[n,m]≢0 d u d≢0 u≢0
 ... | lcm≢0 = ⟦_∥_ (lcm d u) {lcm≢0} (stretchP (q₁ d u) p)
-↑u₁ u {u≢0} (⟦ph_⸲_∥_ {n}{m}{m≢0} t d {d≢0} p)
+↑u₁ u {u≢0} (⟦ph_∥_∥_ {n}{m}{m≢0} t d {d≢0} p)
   with n≢0∧m≢0→lcm[n,m]≢0 (m * d) u (n≢0∧m≢0→nm≢0 m d m≢0 d≢0) u≢0
      | n≢0∧m≢0→nm≢0 m d m≢0 d≢0
 ... | lcm≢0 | q≢0 =
@@ -135,7 +138,7 @@ u↑r {d = d} u {u≢0} r rewrite *-comm d u = u↑l u {u≢0} r
   with n≢0∧m≢0→lcm[n,m]≢0 u d u≢0 d≢0
 ... | lcm≢0 =
   ⟦_∥_ (lcm u d) {lcm≢0} (stretchP (q₁ u d) p)
-↑u₂ d {d≢0} (⟦ph_⸲_∥_ {n}{m}{m≢0} t u {u≢0} p)
+↑u₂ d {d≢0} (⟦ph_∥_∥_ {n}{m}{m≢0} t u {u≢0} p)
   with n≢0∧m≢0→lcm[n,m]≢0 (m * u) d (n≢0∧m≢0→nm≢0 m u m≢0 u≢0) d≢0
      | n≢0∧m≢0→nm≢0 m u m≢0 u≢0
 ... | lcm≢0 | q≢0 =
@@ -186,7 +189,7 @@ mutual
 
   eval : {A : Set} {n : ℕ} {d : ℕ} → Rhythm A n d → Tile A n d
   eval (⟦_∥_ d {d≢0} p) = mediaT (evalP p) d {d≢0}
-  eval (⟦ph_⸲_∥_ {n} {m} {m≢0} t d {d≢0} p)
+  eval (⟦ph_∥_∥_ {n} {m} {m≢0} t d {d≢0} p)
     rewrite NatProp.*-comm m n
     = mediaT (evalP (stretchP n (phrase t p))) (m * d) {n≢0∧m≢0→nm≢0 m d m≢0 d≢0}
   eval (ahead    t  r ) = delay← t (eval r)

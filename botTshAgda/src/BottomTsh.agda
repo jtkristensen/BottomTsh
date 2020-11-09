@@ -10,7 +10,6 @@ import Data.Nat.LCM                          as LCM
 import Data.Integer                          as Int
 import Relation.Nullary.Decidable            as Dec
 import Data.List                             as List
-import Relation.Nullary.Decidable            as Dec
 import Data.Nat.Properties                   as NatProp
 import Agda.Builtin.String                   as String
 import Relation.Binary.PropositionalEquality as Eq
@@ -30,12 +29,12 @@ open TPTM    using    ( Tile ; reset ; _%_ ; stretch ; tile)
                       ; none to noneT )
 open PTM     using    (Media ; some ; none ; _:+:_ ; _:=:_)
 open Rhy     using    ( Rhythm ; repeat
-                      ; _⸲_ ; ⟦_∥_ ; ⟦ph_⸲_∥_ ; ⇐_/_⇐_ ; ⇒_/_⇒_
+                      ; _⸲_ ; ⟦_∥_ ; ⟦ph_∥_∥_ ; ⇐_/_⇐_ ; ⇒_/_⇒_
                       ) public
              using    ( sequence ; u↑l )
              renaming ( eval to evalR )
 open Pat     using    ( Pattern ; ⟨_⟩_ ; o_ ; -_ ; ⟧ ; expand ) public
-             using    ( phrase )
+             using    ( phrase ; opattern)
 open Fin     using    ( Fin ) public
              renaming ( zero     to zero'
                       ; suc      to suc' )
@@ -60,7 +59,10 @@ data ⊥'tsh : (n d : ℕ) → Set where
       → ⊥'tsh n₁        d
       → ⊥'tsh n₂        d
       → ⊥'tsh (n₁ + n₂) d
-  loop : (m : ℕ) → {n d : ℕ} → ⊥'tsh n d → ⊥'tsh (m * n) d
+  repeat : (m : ℕ) → {n d : ℕ} → ⊥'tsh n d → ⊥'tsh (m * n) d
+
+signature : ∀ (n d : ℕ) → {d≢0 : d ≢0} → ⊥'tsh n d
+signature n d {d≢0} =  voice_begin_end {n}{d}{d≢0} "" (⟦_∥_ d {d≢0} (opattern n))
 
 data Sample : Set where
   sample : (file : Name) → (volume : Fin 16) → Sample
@@ -81,7 +83,7 @@ mutual
   eval {n}{d}{d≢0} (sim t₁ t₂)
    = reset (eval {_}{_}{d≢0} t₁) % (eval {_}{_}{d≢0} t₂)
   eval {d≢0 = d≢0} (seq t₁ t₂) = eval {_}{_}{d≢0} t₁ % eval {_}{_}{d≢0} t₂
-  eval {d≢0 = d≢0} (loop  m t) = loop' m d≢0 t
+  eval {d≢0 = d≢0} (repeat  m t) = loop' m d≢0 t
 
   runGroove : {n d : ℕ} → {d≢0 : d ≢0} → (bpm : ℕ) → ⊥'tsh n d → IO ⊤
   runGroove {d≢0 = d≢0} speed drum-loop =
@@ -154,10 +156,10 @@ private
            | NatProp.*-comm n₁ u
            | NatProp.*-comm n₂ u
            = seq (u↑ n₁ d  u {u≢0} t₁) (u↑ n₂ d u {u≢0} t₂)
-  u↑ _ d u {u≢0} (loop m {n} t)
+  u↑ _ d u {u≢0} (repeat m {n} t)
       rewrite sym (NatProp.*-assoc u m n)
             | NatProp.*-comm u m
-            | NatProp.*-assoc m u n = loop m (u↑ n d u {u≢0} t)
+            | NatProp.*-assoc m u n = repeat m (u↑ n d u {u≢0} t)
   sim↑l : (n₁ d₁ d₂ : ℕ) → (d₁≢0 : d₁ ≢0)
       → ⊥'tsh n₁ d₁ → {q≢0 : q₁ d₁ d₂ ≢0}
       → ⊥'tsh (q₁ d₁ d₂ * n₁) (lcm d₁ d₂)
