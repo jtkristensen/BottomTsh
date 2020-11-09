@@ -11,7 +11,7 @@ groove =
     repeat 8 (⟦ 8 ∥ b' 7' ⟧)
   end ،
   voice "808/perc/5" begin
-    repeat 4 (⟦ph 2 ∷ 3 ∷ 4 ∷ 3 ∷ [] ⸲ 8 ∥ 7' 9' 8' 6' ⟧)
+    repeat 4 (⟦ph 2 ∷ 3 ∷ 4 ∷ 3 ∷ [] ∥ 8 ∥ 7' 9' 8' 6' ⟧)
   end ،
   voice "808/sd/3"   begin
     ⇐ 1 / 300 ⇐ repeat 2 (⟦ 8 ∥ o o f' 8' 1' - f' - ⟧)
@@ -23,7 +23,7 @@ groove =
 
 demo : ⊥'tsh 52800 2400
 demo =
-  loop 2 (loop 2 (mob ، (loop 2 groove)) ; groove) ;
+  repeat 2 (repeat 2 (mob ، (repeat 2 groove)) ; groove) ;
   playback 2 "808/glass" f'_ ،
   playback 2 "808/bd/2"  d'_
 

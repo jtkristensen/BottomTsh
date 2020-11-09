@@ -12,10 +12,10 @@ beat  =
     repeat 8 hihat
   end ،
   voice "sd" begin
-    repeat 2 (⇒ 1 / 300 ⇒ snare)
+    ⇒ 1 / 300 ⇒ repeat 2 snare
   end ،
   voice "bd" begin
     ⇐ 1 / 250 ⇐ kick
   end
 
-main = runGroove 105 (loop 4 beat)
+main = runGroove 105 (repeat 4 beat)

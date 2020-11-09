@@ -5,7 +5,7 @@ open import BottomTsh
 
 shuffle-example =
   voice "hhc" begin
-    repeat 4 (⟦ph 3 ∷ 2 ∷ [] ⸲ 8 ∥ f' 8' ⟧)
+    repeat 4 (⟦ph 3 ∷ 2 ∷ [] ∥ 8 ∥ f' 8' ⟧)
   end ،
   voice "hhc" begin
     ⟦ 16 ∥ o o 8' o o o 8' 6' o 6' 8' o o o 8' o ⟧
@@ -17,4 +17,4 @@ shuffle-example =
     ⇐ 1 / 160 ⇐ ⟦ 4 ∥ f' o ⟧ ⸲ ⟦ 8 ∥ o f' ⟧ ⸲ ⟦ 4 ∥ o ⟧
   end
 
-main = runGroove 80 (loop 12 shuffle-example)
+main = runGroove 80 (repeat 12 shuffle-example)

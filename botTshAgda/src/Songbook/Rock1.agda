@@ -26,4 +26,4 @@ rock1' =
     ⟦ 4 ∥ f' o ⟧ ⸲ ⟦ 8 ∥ o f' ⟧ ⸲ ⟦ 4 ∥ o ⟧
   end
 
-main = runGroove 120 (loop 120 rock1')
+main = runGroove 120 (repeat 120 rock1')
