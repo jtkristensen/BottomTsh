@@ -1,0 +1,72 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: ae888df068ee2ee4a49b1a036e810d3790a208081eb77c22cb918ab43fa97e04
+
+name:           bottomTsh-untyped
+version:        0.1.0.0
+author:         Joachim Tilsted Kristensen.
+maintainer:     tilsted@di.ku.dk
+copyright:      2019 Joachim Tilsted Kristensen
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+
+library
+  exposed-modules:
+      BotTsh
+      CSound.Audible
+      CSound.Noises
+      CSound.RenderTPTM
+      CSound.SFX
+      Pattern
+      Polymorphic.Temporal.Media
+      Rhythm
+      Tiled.Polymorphic.Temporal.Media
+      Units
+  other-modules:
+      Paths_bottomTsh_untyped
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , csound-expression
+    , csound-expression-typed
+    , csound-sampler
+    , first-class-families
+    , mtl
+    , parsec
+    , singletons
+    , syb
+    , template-haskell
+    , tuple
+    , typenums
+  default-language: Haskell2010
+
+test-suite dseq-untyped-test
+  type: exitcode-stdio-1.0
+  main-is: All.hs
+  other-modules:
+      Paths_bottomTsh_untyped
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      HUnit
+    , base >=4.7 && <5
+    , csound-expression
+    , csound-expression-typed
+    , csound-sampler
+    , dseq-untyped
+    , first-class-families
+    , mtl
+    , parsec
+    , singletons
+    , syb
+    , template-haskell
+    , tuple
+    , typenums
+  default-language: Haskell2010
