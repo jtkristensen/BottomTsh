@@ -37,8 +37,8 @@ open NatGCD     using    ( gcd; gcd[m,n]∣m; gcd[m,n]∣n )
 open NatDiv     using    ( quotient ; _∣_ ; ∣-trans; n∣n ;∣-antisym; 1∣_; _∣0 )
 open IntProp    using    ( +-injective ; drop‿+≤+ ; drop‿-≤- ; _≤?_
                          ; +-isMagma ; *-isMagma ; 0≤n-m⇒m≤n ; +-mono-≤ ;
-                           ≤-trans ; n⊖n≡0 ; ≤-reflexive ; *-zeroˡ; *-zeroʳ;
-                           neg-distrib-+; neg-involutive)
+                           ≤-trans ; n⊖n≡0 ; ≤-reflexive ; ≤-step ; ≤-steps ; *-zeroˡ; *-zeroʳ;
+                           neg-distrib-+; neg-involutive; [1+m]⊖[1+n]≡m⊖n)
                 renaming ( _≟_ to _=?_ ; +-assoc to ⊕-assoc; +-comm to ⊕-comm)
 open DivMod     using    ( _/_ )
 open Bool       using    ( T ; not )
@@ -65,14 +65,7 @@ q₁ n m = quotient (m∣lcm[m,n] n m)
 -- ******************
 
 ∣x-x∣≡0 : ∀ (x : ℤ) → ∣ x - x ∣ ≡ 0
-∣x-x∣≡0 (+_       0) = refl
-∣x-x∣≡0 (+_ (suc n))
-  with ∣x-x∣≡0 (+ n)
-... | _
-  rewrite n⊖n≡0 n
-        = refl
-∣x-x∣≡0 (ℤ.negsuc  zero  ) = refl
-∣x-x∣≡0 (ℤ.negsuc (suc n)) = ∣x-x∣≡0 (ℤ.negsuc n)
+∣x-x∣≡0 x rewrite IntProp.m≡n⇒m-n≡0 x _ refl = refl
 
 ∣+s-+0∣≡s : ∀ (s : ℕ) → ( ∣ (+ s) - +0 ∣ ) ≡ s
 ∣+s-+0∣≡s  zero                      = refl
@@ -105,22 +98,22 @@ q₁ n m = quotient (m∣lcm[m,n] n m)
 n∣n*m : (n m : ℕ) → n ∣ n * m
 n∣n*m n m
   rewrite *-comm n m
-        = _∣_.divides m refl
+        = NatDiv.divides m refl
 
 m∣n*m : (n m : ℕ) → m ∣ n * m
-m∣n*m n m = _∣_.divides n refl
+m∣n*m n m = NatDiv.divides n refl
 
 lcm[n,m]∣n*m : (n m : ℕ) → lcm n m ∣ n * m
 lcm[n,m]∣n*m n m = lcm-least (n∣n*m n m) (m∣n*m n m)
 
 n≢0∧m≢0→nm≢0 : (n m : ℕ) → (n ≢0) → (m ≢0) → (n * m) ≢0
-n≢0∧m≢0→nm≢0 n@(suc n-1) m@(suc m-1) n≢0 m≢0 = ⊤.tt
+n≢0∧m≢0→nm≢0 n@(suc n-1) m@(suc m-1) n≢0 m≢0 = Unit.tt
 
 n≢0∧c∣n→c≢0 : (n c : ℕ) → (n ≢0) → (c ∣ n) → c ≢0
-n≢0∧c∣n→c≢0 (suc n) zero _ (_∣_.divides (suc q) eq)
+n≢0∧c∣n→c≢0 (suc n) zero _ (NatDiv.divides (suc q) eq)
   rewrite *-comm q 0
         = 0≢1+n {n} (sym eq)
-n≢0∧c∣n→c≢0 (suc n) (suc c) _ (_∣_.divides (suc q) eq) = ⊤.tt
+n≢0∧c∣n→c≢0 (suc n) (suc c) _ (NatDiv.divides (suc q) eq) = Unit.tt
 
 n≢0∧m≢0→lcm[n,m]≢0 : (n m : ℕ) (n≢0 : n ≢0) (m≢0 : m ≢0) → (lcm n m) ≢0
 n≢0∧m≢0→lcm[n,m]≢0 n m n≢0 m≢0
@@ -135,7 +128,7 @@ n≢0∧m≢0→gcd[n,m]≢0 n m n≢0 m≢0 =
   n≢0∧c∣n→c≢0 n (gcd n m) n≢0 (gcd[m,n]∣m n m)
 
 n≢0∧n≡cm→c≢0 : ∀ n m c → n ≢0 → n ≡ c * m → c ≢0
-n≢0∧n≡cm→c≢0 (suc n) m (suc c) n≢0 n≡cm = ⊤.tt
+n≢0∧n≡cm→c≢0 (suc n) m (suc c) n≢0 n≡cm = Unit.tt
 
 n≢0∧m≢0→q[lcm[n,m]]≢0 : (n m : ℕ) (n≢0 : n ≢0) (m≢0 : m ≢0)
                       → quotient (m∣lcm[m,n] n m) ≢0
@@ -197,23 +190,17 @@ m-[n+1]≤m-n : (n m : ℕ) → m ⊖ (suc n) ≤ m ⊖ n
 m-[n+1]≤m-n zero     zero   = -≤+
 m-[n+1]≤m-n zero    (suc m) = +≤+ n≤sn
 m-[n+1]≤m-n (suc n)  zero   = -≤- n≤sn
-m-[n+1]≤m-n (suc n) (suc m) = m-[n+1]≤m-n n m
+m-[n+1]≤m-n (suc n) (suc m)
+  rewrite [1+m]⊖[1+n]≡m⊖n m (suc n)
+        | [1+m]⊖[1+n]≡m⊖n m      n = m-[n+1]≤m-n n m
 
 n≤m→0≤m-nℕ : (n m : ℕ) → n Nat.≤ m → +0 ≤ m ⊖ n
 n≤m→0≤m-nℕ zero     _      _     = +≤+ z≤n
-n≤m→0≤m-nℕ (suc n) (suc m) sn≤sm = n≤m→0≤m-nℕ n m (≤-pred sn≤sm)
+n≤m→0≤m-nℕ (suc n) (suc m) (s≤s n≤m)
+  rewrite [1+m]⊖[1+n]≡m⊖n m n = n≤m→0≤m-nℕ n m n≤m
 
 n≤m→0≤m-n : (n m : ℤ) → n ≤ m → +0 ≤ m - n
-n≤m→0≤m-n _ _ n≤m with n≤m
-n≤m→0≤m-n .(ℤ.negsuc m) .(ℤ.negsuc n) _    | -≤- {m} {n} n≤mℕ = n≤m→0≤m-nℕ n m n≤mℕ
-n≤m→0≤m-n .(ℤ.negsuc m) .(+ n)        _    | -≤+ {m} {n}
-  rewrite +-comm n (suc m)
-        = +≤+ z≤n
-n≤m→0≤m-n .(+ m)        .(+ n)        m≤n  | +≤+ {m} {n} m≤nℕ
-  with m | n
-... | zero    | zero    = +≤+ z≤n
-... | zero    | suc n-1 = +≤+ z≤n
-... | suc m-1 | suc n-1 = n≤m→0≤m-nℕ m-1 n-1 (≤-pred m≤nℕ)
+n≤m→0≤m-n _ _ n≤m = IntProp.m≤n⇒0≤n-m  n≤m
 
 0≤m-n→n≤m : (n m : ℤ) → +0 ≤ m - n → n ≤ m
 0≤m-n→n≤m n m 0≤m-n = 0≤n-m⇒m≤n 0≤m-n
@@ -343,9 +330,7 @@ i≤0→i-n≤0-n i n
         = IntProp.m-n≤m (- (+ n)) (suc i)
 
 n-m≡sn-sm : ∀ n m → (suc n) ⊖ (suc m) ≡ n ⊖ m
-n-m≡sn-sm zero m          = refl
-n-m≡sn-sm (suc n) zero    = refl
-n-m≡sn-sm (suc n) (suc m) = refl
+n-m≡sn-sm = [1+m]⊖[1+n]≡m⊖n
 
 n≤m→n-m≤0 : ∀ {n m} → n Nat.≤ m → (+ n) - (+ m) ≤ +0
 n≤m→n-m≤0 (z≤n {m}) = IntProp.m-n≤m (+ zero) m
@@ -354,16 +339,7 @@ n≤m→n-m≤0 (s≤s {n} {m} n≤m)
         | sym (IntProp.[+m]-[+n]≡m⊖n n m) = n≤m→n-m≤0 n≤m
 
 x≤y→x-y≤0 : ∀ {x y} → x ≤ y → x - y ≤ +0
-x≤y→x-y≤0 (-≤- (z≤n {m})) = IntProp.m⊖n≤m zero m
-x≤y→x-y≤0 (-≤- (s≤s {m} {n} m≤n))
-  rewrite neg-involutive (+ m)
-        | sym (IntProp.[+m]-[+n]≡m⊖n m n) = n≤m→n-m≤0 m≤n
-x≤y→x-y≤0 (-≤+ {m} {n})
-  = ≤-trans (i≤0→i-n≤0-n m n) (IntProp.m-n≤m (+ zero) n)
-x≤y→x-y≤0 (+≤+ (z≤n {m})) = IntProp.m-n≤m (+ zero) m
-x≤y→x-y≤0 (+≤+ (s≤s {m} {n} m≤n))
-  rewrite n-m≡sn-sm m n
-        | sym (IntProp.[+m]-[+n]≡m⊖n m n) = n≤m→n-m≤0 m≤n
+x≤y→x-y≤0 = IntProp.m≤n⇒m-n≤0
 
 x≤0∧y≤z→y+x≤z : ∀ x y z → x ≤ +0 → y ≤ z → y ⊕ x ≤ z
 x≤0∧y≤z→y+x≤z .(ℤ.negsuc m) y z (-≤+ {m}) y≤z = IntProp.≤-steps-neg (suc m) y≤z
@@ -434,12 +410,8 @@ n≤mi≤j→∣m-n∣+∣j-i∣≡∣m+[j-i]]-n∣ n m i j n≤m i≤j
         = refl
 
 n≤m∧0≤k→n≤m+k : ∀ n m k → n ≤ m → +0 ≤ k → n ≤ m ⊕ k
-n≤m∧0≤k→n≤m+k n m (+ k) n≤m 0≤k
-  with IntProp.≤-steps k n≤m
-... | proof
-  rewrite
-       IntProp.+-comm (+ k) m
-       = proof
+n≤m∧0≤k→n≤m+k n m (+ k) n≤m 0≤k with ≤-steps k n≤m
+... | proof rewrite IntProp.+-comm (+ k) m = proof
 
 n≯m∧i≯j→n≯[m+[j-i]] : ∀ {n m i j} → n ≯ m → i ≯ j → n ≯ m ⊕ ( j - i )
 n≯m∧i≯j→n≯[m+[j-i]] {n} {m} {i} {j} n≤m i≤j =
@@ -472,7 +444,7 @@ n≢0→¬n+m≡0 {suc n} {m} n≢0 = λ ()
 ¬n≡0→n≢0 : ∀ {n} → ¬ n ≡ 0 → n ≢0
 ¬n≡0→n≢0 {n} n≢0 with n ≟ 0
 ... | yes p = n≢0 p
-... | no ¬p = ⊤.tt
+... | no ¬p = Unit.tt
 
 private
   q₁d₁d₂*n₁≡q₂d₂d₁*n₂-lemma :

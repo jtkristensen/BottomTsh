@@ -4,6 +4,7 @@ module Polymorphic.Temporal.Math where
 import Data.Nat                              as Nat
 import Data.Nat.Properties                   as NatProp
 import Data.Integer                          as Int
+import Data.Integer.Properties               as IntProp
 import Data.Empty                            as Void
 import Relation.Nullary                      as Dec
 import Relation.Binary.PropositionalEquality as Eq
@@ -52,9 +53,11 @@ n≤m→n⊔m≡m {suc n} {suc m} n≤m
   rewrite n≤m→n⊔m≡m (≤-pred n≤m) = refl
 
 n≤m→n⊔m≡[m-n]+n : {n m : ℕ} → n ≤ m → ∣ m ⊖ n ∣ + n ≡ m
-n≤m→n⊔m≡[m-n]+n {zero}  {    m} _     rewrite +-comm m 0 | +-comm m 0 = refl
+n≤m→n⊔m≡[m-n]+n {zero}  {    m} _
+  rewrite +-comm m 0 | +-comm m 0 = refl
 n≤m→n⊔m≡[m-n]+n {suc n} {suc m} sn≤sm
-  rewrite +-comm (∣ m ⊖ n ∣) (suc n)
+  rewrite IntProp.[1+m]⊖[1+n]≡m⊖n m n
+        | +-comm (∣ m ⊖ n ∣) (suc n)
         | +-comm n (∣ m ⊖ n ∣)
         | n≤m→n⊔m≡[m-n]+n (≤-pred sn≤sm) = refl
 

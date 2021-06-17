@@ -10,11 +10,16 @@ default:
 	 $(c) $(song)
 
 songbook: clean_intermediate
+	$(MAKE) setup
 	for f in $$(ls ./Songbook) ; do $(MAKE) song=./Songbook/$$f ; done
+
+setup:
+	cabal install csound-expression
+	cabal install csound-sampler
 
 clean   : clean_all
 
-clean_all: clean_alonzo clean_intermediate clean_examples
+clean_all: clean_alonzo clean_intermediate
 
 clean_alonzo:
 	rm -rf ./MAlonzo
@@ -41,3 +46,5 @@ clean_intermediate:
 	rm -f ./Gnava
 	rm -f ./DeanTown
 	rm -f ./World
+	rm -f ./ClappingMusic
+
