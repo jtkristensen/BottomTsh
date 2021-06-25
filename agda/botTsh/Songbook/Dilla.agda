@@ -16,7 +16,7 @@ rock1 =
     ⟦ 4 ∥ o f' o f' ⟧
   end ،
   voice "bd" begin
-    ⟦ (4 ⸴ 2) ∥ f' - - o o f' - - ⟧
+    ⟦ (4 * 2) ∥ f' - - o o f' - - ⟧
   end
 
 main = runGroove 80 (repeat 4 rock1)
