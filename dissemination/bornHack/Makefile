@@ -7,6 +7,4 @@ figures:
 	cd ../figures/ly && $(MAKE) all
 
 clean:
-	rm -f *.eps *.aux *.log *.out *.snm *.nav *.toc *.vrb
-	rm -f main.pdf
-	rm -rf _minted-main
+	for f in $$(cat .gitignore) ; do rm -rf $$f ; done
