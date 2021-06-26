@@ -1,0 +1,35 @@
+\documentclass{standalone}
+\begin{document}
+\begin{lilypond}
+#(define mydrums '(
+    (bassdrum        default  #f -3)
+    (snare           default  #f -1)
+    (openhihat       cross    #f  1)
+    (hihat           cross    #f  3)))
+up   = \drummode {
+    \time 4/4
+    \autoBeamOff
+    hh8[ hh hh] hh8[ hh hh] hh8[ hh hh]
+    hh8[ hh hh] hh8[ hh hh] hh8[ hh hh]
+    hh8[ hh hh] hh8[ hh hh]
+}
+down = \drummode {
+  \time 4/4
+  \autoBeamOff
+  bd4    sn    r8[ bd] sn4
+  bd4    sn    r8[ bd] sn4
+  bd4    sn    r8[ bd] sn4
+}
+\new DrumStaff <<
+  \set DrumStaff.drumStyleTable = #(alist->hash-table mydrums)
+  \new DrumVoice { \voiceOne \up   }
+  \new DrumVoice { \voiceTwo \down }
+  >>
+\layout {
+  \context {
+    \DrumStaff
+    \remove "Time_signature_engraver"
+    }
+}
+\end{lilypond}
+\end{document}

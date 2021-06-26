@@ -1,0 +1,28 @@
+\documentclass{standalone}
+\begin{document}
+\begin{lilypond}
+  \score {
+    <<
+    \new Staff {
+      \tempo "" 4 = 400
+      \new Voice = "melody" {
+        \clef percussion
+        \relative { f2 f4. f f2 f4. f }
+      }
+    }
+    \new Lyrics {
+      \lyricsto "melody" {
+        Pro -- gram -- ming drum pat -- terns
+      }
+    }
+    >>
+  }
+  \layout {
+    \context {
+      \Staff
+      \remove Time_signature_engraver
+      \omit BarLine
+  }}
+\end{lilypond}
+\end{document}
+

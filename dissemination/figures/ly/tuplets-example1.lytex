@@ -1,0 +1,31 @@
+\documentclass{standalone}
+\begin{document}
+\begin{lilypond}
+#(define mydrums '((tambourine default #t 0)))
+rhythm = {
+  \override Staff.StaffSymbol #'line-positions = #'( 0 )
+  \override Staff.BarLine #'bar-extent = #'(-1.5 . 1.5)
+}
+
+\new DrumStaff {
+  \rhythm
+  \set DrumStaff.drumStyleTable = #(alist->hash-table mydrums)
+  \numericTimeSignature
+  % \set DrumStaff.instrumentName = #"Tamtam"
+  \drummode {
+    %% \time 4/4
+    % \autoBeamOff
+    tamb4. \times 2/3 { tamb4. tamb8~ \times 2/3 {tamb [tamb tamb~]}} tamb8
+  }
+}
+\layout {
+  \context {
+    \DrumStaff
+    \remove "Bar_engraver"
+    \remove "Time_signature_engraver"
+    \remove "Clef_engraver"
+    }
+  }
+
+\end{lilypond}
+\end{document}

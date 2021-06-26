@@ -1,0 +1,24 @@
+\documentclass{standalone}
+\begin{document}
+\begin{lilypond}
+\new DrumStaff {
+  #(define single-lined-percussion '(
+           (snare default #f 0)
+           (hihat cross   #f 0)))
+  \override Staff.StaffSymbol.line-positions = #'(0)
+  \override Score.RehearsalMark.font-family = #'typewriter
+  \set DrumStaff.drumStyleTable = #(alist->hash-table single-lined-percussion)
+  \drummode {
+    \time 2/4
+    hh8 hh
+  }
+}
+\layout {
+  \context {
+    \DrumStaff
+    \remove "Time_signature_engraver"
+    \remove "Clef_engraver"
+    }
+}
+\end{lilypond}
+\end{document}

@@ -1,0 +1,33 @@
+\documentclass{standalone}
+\begin{document}
+\begin{lilypond}
+#(define mydrums '(
+    (bassdrum        default  #f -3)
+    (snare           default  #f -1)
+    (openhihat       cross    #f  1)
+    (hihat           cross    #f  3)))
+up   = \drummode {
+    \autoBeamOff
+    \tuplet 5/2 {hh4.[ hh4]
+                 hh4.[ hh4]
+                 hh4.[ hh4]
+                 hh4.[ hh4]}
+}
+down = \drummode {
+  \autoBeamOff
+  bd8[ hho]  sn[ hho16 hho] r[ hho << hho bd8] >> sn[ hho]
+}
+\new DrumStaff <<
+\set DrumStaff.drumStyleTable = #(alist->hash-table mydrums)
+\time #'(2 2 2 2) 4/4
+\numericTimeSignature
+\new DrumVoice { \voiceOne \up   }
+\new DrumVoice { \voiceTwo \down }
+>>
+\layout {
+  \context {
+    \DrumStaff
+  }
+}
+\end{lilypond}
+\end{document}
