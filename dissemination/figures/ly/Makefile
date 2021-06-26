@@ -17,7 +17,7 @@ all: $(dseq) $(notes) $(transformations) $(grooves) $(patterns)
 
 %.pdf : $(out)
 	FILE=$@                                            && \
-	FILE="$${file%%.*}"                                && \
+	FILE="$${FILE%%.*}"                                && \
 	lilypond-book --output=$(out) --pdf ./$$FILE.lytex && \
 	cd ./$(out)                                        && \
 	pdflatex $$FILE.tex                                && \
