@@ -1,9 +1,0 @@
-#!/bin/bash
-
-lilypond-book --output=$1 --pdf ./$3.lytex &&
-cd ./$1                                    &&
-pdflatex $3.tex                            &&
-pdfcrop  $3.pdf                            &&
-mv ./$3-crop.pdf ./../$3.pdf               &&
-cd ../                                     &&
-echo $3 >> $2

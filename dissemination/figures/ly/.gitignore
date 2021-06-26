@@ -1,9 +1,8 @@
-/auto
-/out-dir
+auto/
+out-dir/
 5shuffle.pdf
 dseq-basic.pdf
 dseq-tuplets.pdf
-list_of_figures.txt
 more-notes.pdf
 note-ganz.pdf
 programming_drumpatterns1.pdf
