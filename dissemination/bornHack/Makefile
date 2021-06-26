@@ -6,4 +6,4 @@ all:
 clean:
 	rm -f *.eps *.aux *.log *.out *.snm *.nav *.toc *.vrb
 	rm -f main.pdf
-	rm -rf _minted_main
+	rm -rf _minted-main
