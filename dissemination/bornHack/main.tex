@@ -1,0 +1,223 @@
+\documentclass[dvipsnames]{beamer}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{colortbl}
+\usepackage[english]{babel}
+\usepackage{pgf}
+%\usepackage{beamerthemesplit}
+\usepackage{graphicx,epsfig, subfigure}
+\usepackage{hyperref}
+%\usepackage{srcltx}
+\usepackage{multirow}
+\usepackage{minted}
+\definecolor{lightgray}{rgb}{.3,.3,.3}
+
+\usepackage{niceslides}
+
+\title{A Dependently Timed Drum Machine Language}
+\author{Joachim Tilsted Kristensen \texttt{tilsted@di.ku.dk}}
+\institute{Department of Computer Science (DIKU)\\ University of Copenhagen}
+
+\date{Various Locations (via Zoom)\\
+  April 15th, 2020}
+
+%\setlength{\parskip}{\baselineskip}
+
+\def\Var{\ensuremath{\text{\bf Var}}}
+\def\Con{\ensuremath{\text{\bf Con}}}
+\def\N{\ensuremath{\mathbb N}}
+\def\R{\ensuremath{\mathbb R}}
+\def\Q{\ensuremath{\mathbb Q}}
+\def\OR{\ensuremath{\ |\ }}
+\def\TO{\ensuremath{\rightarrow}}
+\def\LB{\ensuremath{\llbracket}}
+\def\RB{\ensuremath{\rrbracket}}
+\newcommand\LIT[1]{\ensuremath{\text{\tt #1}}}
+\newcommand\SLIT[1]{\ \LIT{#1}\ }
+\newcommand\IF[3]{\LIT{if}\ #1\ \LIT{then}\ #2\ \LIT{else}\ #3}
+\newcommand\INBR[1]{\ensuremath{\llbracket #1 \rrbracket}}
+\def\Eval{\ensuremath \downarrow}
+\newcommand \BX [1]
+  {\scriptsize\framebox{{\raisebox{0pt}[0.7\baselineskip][0.01\baselineskip]{\small #1}}}}
+
+\newcommand\Axiom[2]
+                 {\ensuremath{\text{\small #1}:\frac{\displaystyle}
+                 {\displaystyle #2}}
+                 }
+\newcommand\InfOne[3]
+                 {\ensuremath{\text{\small #2}:\frac{\displaystyle #1}
+                 {\displaystyle #3}}
+                 }
+\newcommand\InfTwo[4]
+                 {\ensuremath{\text{\small #3}:\frac{\displaystyle #1 \quad #2}
+                 {\displaystyle #4}}
+                 }
+\newcommand\InfThree[5]
+                 {\ensuremath{\text{\small #4}:
+                     \frac{\displaystyle #1 \quad #2 \quad #3}
+                          {\displaystyle #5}}
+                 }
+\newcommand\InfFour[6]
+                 {\ensuremath{\text{\small #5}:
+                     \frac{\displaystyle #1 \quad #2 \quad #3 \quad #4}
+                          {\displaystyle #6}}
+                 }
+\newcommand\InfFive[7]
+                 {\ensuremath{\text{\small #6}:
+                     \frac{\displaystyle #1 \quad #2 \quad #3 \quad #4 \quad #5}
+                          {\displaystyle #7}}
+                 }
+
+
+\begin{document}
+\frame{\titlepage \vspace{-0.5cm}
+}
+
+\section{Introduction}
+\frame{\frametitle{Rhythms and Signals}
+  \centering
+ {\tt programming drum patterns}
+}
+\frame{\frametitle{Phrasings (Sheet Music Style).}
+  \centering
+  \includegraphics[height=0.3\textheight]{../thesis/figures/ly/programming_drumpatterns1}\\
+  \includegraphics[height=0.3\textheight]{../thesis/figures/ly/programming_drumpatterns2}\\
+  \includegraphics[height=0.3\textheight]{../thesis/figures/ly/programming_drumpatterns3}\\
+}
+\frame{\frametitle{Grid Editors}
+  \centering
+  \includegraphics[width=0.8\textwidth]{../thesis/figures/illustrations/lmms/rock1}\\
+  \vspace{0.5cm}
+  \includegraphics[width=0.8\textwidth]{../thesis/figures/ly/rock2}
+}
+
+\frame{\frametitle{Signal Processing Languages}
+  \includegraphics[width=\textwidth]{img/ChucK}
+}
+
+\frame{\frametitle{Music Score Representations and {\tt dseq}}
+  \includegraphics[width=\textwidth]{img/dillalude}\\
+
+  \includegraphics[width=\textwidth]{img/dseq}
+}
+
+\section{Problem Domain}
+\frame{\frametitle{Analysis}
+  \begin{block}{Grid Editor}
+  \begin{itemize}
+    \item Syntactic Overview/Constraints.
+    \item Speculative Grid Selection.
+    \item Specialised for Contemporary Western Music.
+  \end{itemize}
+  \end{block}
+
+  \begin{block}{Signal Processors}
+    \begin{itemize}
+      \item Full Control over Signals.
+      \item Poor Structuring Mechanisms.
+      \end{itemize}
+  \end{block}
+  \begin{block}{Music Sheet Representations}
+    \begin{itemize}
+      \item Concise familiar notation.
+      \item Trades of Syntactic Constraints for Expressive Power.
+      \item Inherits Unfortunate Flaws from Sheet Music.
+    \end{itemize}
+  \end{block}
+}
+
+\frame{
+  \frametitle{Design}
+  \begin{block}{Goals:}
+    \begin{itemize}
+    \item Declarative.
+    \item Expressive.
+    \item Composable.
+    \item Separation of Concerns.
+    \item Preserve Alignment Constraints.
+    \end{itemize}
+  \end{block}
+}
+
+\begin{frame}
+  \frametitle{Language overview}
+
+  \begin{block}{Primitives:}
+    \begin{itemize}
+    \item Signals
+    \end{itemize}
+  \end{block}
+
+
+  \begin{block}{User definable}
+    \begin{itemize}
+    \item Patterns
+    \item Rhythms
+    \item Grooves
+    \end{itemize}
+  \end{block}
+
+\end{frame}
+
+\section{F$_\flat$}
+\begin{frame}[fragile]\frametitle{$\bot$'tsh 1.0 (Syntax)}
+  \begin{center}
+{\scriptsize
+\begin{align*}
+  s &\in \Var &\text{(Well-formed signal names)}\\ a &\in \{\LIT{0}, \dots,
+  \LIT{f}\} &\text{(Loudness)}\\ n,t,d &\in \N &\text{(Natural numbers)}\\ q
+  &\in \mathbb Q_{\geq 0} &\text{(Fractions)}\\ ns ::&=
+  \LIT{[]}\ |\ \OR\ n\ \LIT{::}\ ns &\text{(Shapes)}\\ g ::&=
+  \LIT{signature}\ n\ d
+  &\text{(Grooves)}\\ &\OR\ \LIT{voice}\ s\ \LIT{begin}\ r\ \LIT{end}\\ &\OR\ \LIT{repeat}\ n\ g\\ &\OR\ g_1
+  , g_2\\ &\OR\ g_1 ; g_2\\ r ::&= (n_1, n_2, \dots) \{p\}
+  &\text{(Rhythms)}\\ &\OR\ [ns]\ (n_1, n_2, \dots)\{p\}\\ &\OR\ \LIT{<}
+  q\LIT{=}\ r\\ &\OR\ \LIT{=}q\LIT{>}\ r\\ &\OR\ \LIT{repeat}\ n\ r\\ &\OR\ r_1\ ;
+  r_2\\ p ::&=
+  a\ p\ \OR\ \LIT{-}\ p\ \OR\ \LIT{.}\ p\ |\ \epsilon &\text{(Monophonic
+    Metrical Patterns)}
+\end{align*}
+}
+\end{center}
+\end{frame}
+
+\frame{\frametitle{$\bot$'tsh 1.0 (Typing)}
+  \begin{align*}
+    \tau := \LIT{Signal}\ |\ \LIT{Pattern}\ n\ |\ \LIT{Rhythm}\ n\ d\ |\ \LIT{Groove}\ n\ d
+  \end{align*}\\
+  \includegraphics[width=\textwidth]{img/TypingPatterns}\\
+}
+\frame{\frametitle{$\bot$'tsh 1.0 (Typing)}
+  \includegraphics[width=\textwidth]{img/TypingRhythms}\\
+}
+\frame{\frametitle{$\bot$'tsh 1.0 (Typing)}
+  \includegraphics[width=\textwidth]{img/TypingGrooves}\\
+}
+
+
+\begin{frame}
+  \Huge\centering
+  \intro{Demonstration}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Future}
+  \begin{itemize}
+    \item Euclidean Rhythms.
+    \item Cabbage/VST.
+    \item Metric Structures.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \Huge\centering
+  \intro{Thank You}
+\end{frame}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
