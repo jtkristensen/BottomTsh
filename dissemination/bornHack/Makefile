@@ -1,3 +1,8 @@
+# Requirements
+# - you need a variety of things from texlive
+# - lytex
+# - Pygments (pip install)
+
 all: figures
 	$(MAKE) clean
 	pdflatex --shell-escape main.tex

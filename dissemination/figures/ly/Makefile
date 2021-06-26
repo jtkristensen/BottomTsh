@@ -10,10 +10,6 @@ transformations=two8ths.pdf swing101.pdf shuffle101.pdf 5shuffle.pdf
 grooves=rock2.pdf rock2_shuffle3.pdf rock2_hh_shuffle.pdf spacerock2.pdf rock2times3.pdf
 patterns=programming_drumpatterns1.pdf programming_drumpatterns2.pdf programming_drumpatterns3.pdf
 
-out=out-dir
-list=list_of_figures.txt
-cur=rock2_hh_shuffle.pdf
-
 all: $(dseq) $(notes) $(transformations) $(grooves) $(patterns)
 
 programming_drumpatterns1.pdf:
@@ -73,11 +69,8 @@ spacerock2.pdf:
 rock2times3.pdf:
 	./figure $(out) $(list) rock2times3
 
-
 clean:
-	rm -f  $(list)
-	rm -f  ./*.pdf
-	rm -rf $(out)
+	for f in $$(cat .gitignore) ; do rm -rf $$f ; done
 
 current:
 	rm -f $(cur)
