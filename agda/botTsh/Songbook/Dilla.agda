@@ -3,7 +3,7 @@ module Songbook.Dilla where
 
 open import BottomTsh
 
--- Ahh, this is hipper {^_^}.
+--
 rock1 =
   signature 4 4 ،
   voice "hhc" begin

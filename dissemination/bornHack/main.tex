@@ -16,11 +16,10 @@
 \usepackage{niceslides}
 
 \title{A Dependently Timed Drum Machine Language}
-\author{Joachim Tilsted Kristensen \texttt{tilsted@di.ku.dk}}
-\institute{Department of Computer Science (DIKU)\\ University of Copenhagen}
+\author{Joachim Tilsted Kristensen\\ \texttt{joachim.tilsted@gmail.com}}
+\institute{BornHack}
 
-\date{Various Locations (via Zoom)\\
-  April 15th, 2020}
+\date{}
 
 %\setlength{\parskip}{\baselineskip}
 
@@ -38,47 +37,12 @@
 \newcommand\IF[3]{\LIT{if}\ #1\ \LIT{then}\ #2\ \LIT{else}\ #3}
 \newcommand\INBR[1]{\ensurennmath{\llbracket #1 \rrbracket}}
 \def\Eval{\ensuremath \downarrow}
-\newcommand \BX [1]
-  {\scriptsize\framebox{{\raisebox{0pt}[0.7\baselineskip][0.01\baselineskip]{\small #1}}}}
-
-\newcommand\Axiom[2]
-                 {\ensuremath{\text{\small #1}:\frac{\displaystyle}
-                 {\displaystyle #2}}
-                 }
-\newcommand\InfOne[3]
-                 {\ensuremath{\text{\small #2}:\frac{\displaystyle #1}
-                 {\displaystyle #3}}
-                 }
-\newcommand\InfTwo[4]
-                 {\ensuremath{\text{\small #3}:\frac{\displaystyle #1 \quad #2}
-                 {\displaystyle #4}}
-                 }
-\newcommand\InfThree[5]
-                 {\ensuremath{\text{\small #4}:
-                     \frac{\displaystyle #1 \quad #2 \quad #3}
-                          {\displaystyle #5}}
-                 }
-\newcommand\InfFour[6]
-                 {\ensuremath{\text{\small #5}:
-                     \frac{\displaystyle #1 \quad #2 \quad #3 \quad #4}
-                          {\displaystyle #6}}
-                 }
-\newcommand\InfFive[7]
-                 {\ensuremath{\text{\small #6}:
-                     \frac{\displaystyle #1 \quad #2 \quad #3 \quad #4 \quad #5}
-                          {\displaystyle #7}}
-                 }
-
 
 \begin{document}
 \frame{\titlepage \vspace{-0.5cm}
 }
 
 \section{Introduction}
-\frame{\frametitle{Rhythms and Signals}
-  \centering
- {\tt programming drum patterns}
-}
 \frame{\frametitle{Phrasings (Sheet Music Style).}
   \centering
   \includegraphics[height=0.3\textheight]{../figures/ly/programming_drumpatterns1}\\
@@ -90,6 +54,10 @@
   \includegraphics[width=0.8\textwidth]{../figures/illustrations/lmms/rock1}\\
   \vspace{0.5cm}
   \includegraphics[width=0.8\textwidth]{../figures/ly/rock2}
+}
+\frame{\frametitle{Rhythms and Signals}
+  \centering
+   \includegraphics[width=\textwidth]{../figures/illustrations/oscilloscope/brazillian}\\
 }
 
 \frame{\frametitle{Signal Processing Languages}
@@ -121,7 +89,7 @@
   \begin{block}{Music Sheet Representations}
     \begin{itemize}
       \item Concise familiar notation.
-      \item Trades of Syntactic Constraints for Expressive Power.
+      \item Trades off Syntactic Constraints for Expressive Power.
       \item Inherits Unfortunate Flaws from Sheet Music.
     \end{itemize}
   \end{block}
@@ -139,6 +107,36 @@
     \end{itemize}
   \end{block}
 }
+
+\frame{
+  \frametitle{Lambda Cube ($\lambda_\rightarrow$)}
+  \includegraphics[width=0.5\textwidth]{../figures/illustrations/lambda_calculus/basic_syntax}\\ \\
+
+  \includegraphics[width=\textwidth]{../figures/illustrations/lambda_calculus/basic_typing}
+}
+
+\frame{
+  \frametitle{Lambda Cube ($\lambda_2$)}
+  \includegraphics[width=0.5\textwidth]{../figures/illustrations/lambda_calculus/polymorphic_syntax}\\
+  \includegraphics[width=\textwidth]{../figures/illustrations/lambda_calculus/basic_typing}\\
+  \includegraphics[width=\textwidth]{../figures/illustrations/lambda_calculus/polymorphic_typing}
+}
+
+\frame{
+  \frametitle{Lambda Cube ($\lambda_\omega$)}
+  \includegraphics[width=0.5\textwidth]{../figures/illustrations/lambda_calculus/type_level_syntax}\\
+  \includegraphics[width=\textwidth]{../figures/illustrations/lambda_calculus/basic_typing}\\
+
+  repeat Var$_t$, Abs$_{t\rightarrow{t}}$ and App$_{tt}$ to get Var$_\tau$, Abs$_{\tau\rightarrow\tau}$ and App$_{\tau\tau}$.
+}
+
+\frame{
+  \frametitle{Lambda Cube ($\lambda_\Pi$)}
+  \includegraphics[width=0.5\textwidth]{../figures/illustrations/lambda_calculus/dependent_syntax}\\
+  \includegraphics[width=0.9\textwidth]{../figures/illustrations/lambda_calculus/basic_typing}\\
+  \includegraphics[width=0.9\textwidth]{../figures/illustrations/lambda_calculus/dependent_typing}
+}
+
 
 \begin{frame}
   \frametitle{Language overview}
@@ -160,7 +158,6 @@
 
 \end{frame}
 
-\section{F$_\flat$}
 \begin{frame}[fragile]\frametitle{$\bot$'tsh 1.0 (Syntax)}
   \begin{center}
 {\scriptsize
@@ -168,12 +165,12 @@
   s &\in \Var &\text{(Well-formed signal names)}\\ a &\in \{\LIT{0}, \dots,
   \LIT{f}\} &\text{(Loudness)}\\ n,t,d &\in \N &\text{(Natural numbers)}\\ q
   &\in \mathbb Q_{\geq 0} &\text{(Fractions)}\\ ns ::&=
-  \LIT{[]}\ |\ \OR\ n\ \LIT{::}\ ns &\text{(Shapes)}\\ g ::&=
+  \LIT{[]}\ \OR\ n\ \LIT{::}\ ns &\text{(Shapes)}\\ g ::&=
   \LIT{signature}\ n\ d
   &\text{(Grooves)}\\ &\OR\ \LIT{voice}\ s\ \LIT{begin}\ r\ \LIT{end}\\ &\OR\ \LIT{repeat}\ n\ g\\ &\OR\ g_1
   , g_2\\ &\OR\ g_1 ; g_2\\ r ::&= (n_1, n_2, \dots) \{p\}
   &\text{(Rhythms)}\\ &\OR\ [ns]\ (n_1, n_2, \dots)\{p\}\\ &\OR\ \LIT{<}
-  q\LIT{=}\ r\\ &\OR\ \LIT{=}q\LIT{>}\ r\\ &\OR\ \LIT{repeat}\ n\ r\\ &\OR\ r_1\ ;
+  q\LIT{=}\ r\\ &\OR\ \LIT{=}q\LIT{>}\ r\\ &\OR\ r_1\ ;
   r_2\\ p ::&=
   a\ p\ \OR\ \LIT{-}\ p\ \OR\ \LIT{.}\ p\ |\ \epsilon &\text{(Monophonic
     Metrical Patterns)}

@@ -124,7 +124,8 @@ test =
          hhc  <- (2,2,2) { f8 } x 4
    |]
 
-main = dac $ mix $ runTPTM 90 $ eval $ examples
+run  = dac . mix . runTPTM 90 . eval
+main = run examples
 
 -- Example for report.
 -- Problem (sfx applied only locally.
