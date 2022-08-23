@@ -29,10 +29,10 @@ back-beat =
   end
 
 groove =
-  repeat 4 gnawa ;
-  repeat 4 (gnawa ، son-clave) ;
-  repeat 4 (gnawa ، son-clave ، pulse) ;
-  repeat 4 (gnawa ، son-clave ، pulse ، shuffle) ;
-  repeat 8 (gnawa ، son-clave ، pulse ، shuffle ، back-beat)
+  repeat  4 gnawa ;
+  repeat  4 (gnawa ، son-clave) ;
+  repeat  4 (gnawa ، son-clave ، pulse) ;
+  repeat  4 (gnawa ، son-clave ، pulse ، shuffle) ;
+  repeat 42 (gnawa ، son-clave ، pulse ، shuffle ، back-beat)
 
 main = runGroove 94 (groove)

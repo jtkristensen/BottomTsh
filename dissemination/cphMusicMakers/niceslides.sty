@@ -1,0 +1,33 @@
+% Font
+\usepackage{paratype}
+\setbeamerfont{frametitle}{family=\bf}
+
+\usepackage{xcolor}
+\definecolor{TomorrowRed}{HTML}{c82829}
+\definecolor{TomorrowGreen}{HTML}{718c00}
+\definecolor{TomorrowYellow}{HTML}{eab700}
+\definecolor{TomorrowPurple}{HTML}{8959a8}
+\definecolor{TomorrowBlue}{HTML}{4271ae}
+%% \definecolor{TomorrowOrange}{HTML}{f5871f}
+
+% Beamer theme settings
+\usecolortheme[named=TomorrowGreen]{structure}
+\usenavigationsymbolstemplate{} % no navigation buttons
+
+\mode<presentation>
+{
+  \usetheme{default}
+}
+%\usefonttheme{serif}
+\setbeamersize{text margin left=1em,text margin right=1em}
+\setbeamertemplate{footline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+%    \usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
+    \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+\newcommand*{\intro}[1]{{\usebeamercolor{structure}\textcolor{fg}{#1}}}
