@@ -3,7 +3,7 @@ module Songbook.Dilla where
 
 open import BottomTsh
 
--- Hip Hop {^_^}.
+-- A hipper hip hop beat {^o^}!
 beat =
   signature 4 4 ،
   voice "hhc" begin

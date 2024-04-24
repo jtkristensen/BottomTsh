@@ -66,12 +66,12 @@ ending =
 song =
   repeat  8 verse     ;
   repeat  4 bridge    ;
-  break             ;
+  break               ;
   repeat  8 chorus    ;
   repeat  2 break     ;
   repeat  4 verse     ;
   repeat  4 bridge    ;
-  break             ;
+  break               ;
   repeat  8 chorus    ;
   repeat  4 c-section ;
   repeat  4 break     ;
