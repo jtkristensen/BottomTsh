@@ -4,7 +4,7 @@ module Songbook.BrazillianSixteen where
 open import BottomTsh
 
 -- Brazillian man's Hip Hop {~_^}.
-hihat = ⟦ 16 ∥ f' 7' ⟧ ⸲ ⟦ 16 ∥ a' 8' ⟧
+hihat = ⟦ 16 ∥ f' 7' ⟧ ⸲ ⇐ 1 / 64 ⇐ ⟦ 16 ∥ a' 8' ⟧
 snare = ⟦ 4  ∥ o f' o f' ⟧
 kick  = ⟦ 8  ∥ f' o  o  f' o  o  o  f' ⟧ ⸲
         ⟦ 8  ∥ o  f' o  o  f' o  f' o  ⟧
@@ -13,10 +13,10 @@ beat  =
     repeat 8 hihat
   end ،
   voice "sd" begin
-    repeat 2 snare
+    ⇒ 1 / 300 ⇒ repeat 2 snare
   end ،
   voice "bd" begin
-    kick
+    ⇐ 1 / 256 ⇐ kick
   end
 
 main = runGroove 105 (repeat 4 beat)

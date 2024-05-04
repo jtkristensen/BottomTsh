@@ -3,11 +3,11 @@ module Songbook.Dilla where
 
 open import BottomTsh
 
--- An old school hip hop beat [-_-].
+-- Much hipper {^o^}!
 beat =
   signature 4 4 ،
   voice "hhc" begin
-    repeat 4 (⟦ 8 ∥ f' 8' ⟧)
+    repeat 4 (⟦ph 3 ∷ 2 ∷ [] ∥ 8 ∥ f' 8' ⟧)
   end ،
   voice "hhc" begin
     ⟦ 16 ∥ o o 8' o o o 8' 6' o 6' 8' o o o 8' o ⟧
